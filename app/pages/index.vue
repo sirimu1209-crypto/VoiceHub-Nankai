@@ -68,7 +68,7 @@
         <div class="title-container">
           <h2 class="main-title">{{ siteTitle }}</h2>
           <div class="title-divider" />
-          <span class="sub-title">VoiceHub 校园广播系统</span>
+          <span class="sub-title">允公允能 日新月异</span>
         </div>
       </div>
 
@@ -1570,7 +1570,7 @@ if (
 }
 
 .logo-image {
-  width: 150px;
+  width: 100px;
   height: auto;
   object-fit: contain;
 }
@@ -2616,11 +2616,11 @@ if (
 
   .logo-section {
     min-height: auto;
-    gap: 8px;
+    gap: 0px;
   }
 
   .logo-image {
-    width: 76px;
+    width: 40px;
     height: auto;
   }
 
