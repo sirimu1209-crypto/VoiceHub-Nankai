@@ -12,15 +12,15 @@
         <NuxtLink to="/" class="flex items-center gap-2.5 group">
           <!-- Logo 图标 -->
           <div class="flex-shrink-0 group-hover:scale-110 transition-all duration-300">
-            <img :src="logo" alt="VoiceHub Logo" class="w-8 h-8 object-contain" >
+            <img :src="logo" alt="重庆南开中学" class="w-8 h-8 object-contain" >
           </div>
           <!-- 品牌文字 -->
           <div class="flex flex-col justify-center">
-            <h1 class="font-bold text-lg text-zinc-100 leading-none tracking-tight">VoiceHub</h1>
+            <h1 class="font-bold text-lg text-zinc-100 leading-none tracking-tight">重庆南开中学</h1>
             <p
               class="text-[10px] text-zinc-500 mt-1.5 uppercase tracking-widest font-bold leading-none"
             >
-              管理控制台
+              终端管理后台
             </p>
           </div>
         </NuxtLink>
