@@ -2,10 +2,11 @@
   <div class="register-form">
     <div class="form-header">
       <h2>创建账号</h2>
-      <p>{{ siteTitleText }}</p>
+      <p>Nanyu Secondary School</p>
     </div>
 
     <form :class="['auth-form', { 'has-error': !!error }]" @submit.prevent="handleRegister">
+      <!-- 姓名 -->
       <div class="form-group">
         <label for="name">姓名</label>
         <div class="input-wrapper">
@@ -31,6 +32,7 @@
         </div>
       </div>
 
+      <!-- 用户名 -->
       <div class="form-group">
         <label for="username">用户名</label>
         <div class="input-wrapper">
@@ -56,6 +58,7 @@
         </div>
       </div>
 
+      <!-- 密码 -->
       <div class="form-group">
         <label for="password">密码</label>
         <div class="input-wrapper">
@@ -100,6 +103,7 @@
         </div>
       </div>
 
+      <!-- 确认密码 -->
       <div class="form-group">
         <label for="confirmPassword">确认密码</label>
         <div class="input-wrapper">
@@ -144,6 +148,7 @@
         </div>
       </div>
 
+      <!-- 年级 -->
       <div class="form-group">
         <label for="grade">年级</label>
         <div class="select-wrapper">
@@ -152,7 +157,6 @@
             v-model="grade"
             :class="{ 'select-error': error && gradeError }"
             required
-            @change="handleGradeChange"
           >
             <option value="">-- 请选择年级 --</option>
             <option value="高一年级">高一年级</option>
@@ -171,6 +175,7 @@
         </div>
       </div>
 
+      <!-- 班级 -->
       <div class="form-group">
         <label for="class">班级</label>
         <div class="input-wrapper">
@@ -198,6 +203,7 @@
         </div>
       </div>
 
+      <!-- 错误提示 -->
       <div v-if="error" class="error-container">
         <svg
           class="error-icon"
@@ -213,6 +219,7 @@
         <span class="error-message">{{ error }}</span>
       </div>
 
+      <!-- 成功提示 -->
       <div v-if="success" class="success-container">
         <svg
           class="success-icon"
@@ -227,6 +234,7 @@
         <span class="success-message">{{ success }}</span>
       </div>
 
+      <!-- 提交按钮 -->
       <button :disabled="loading" class="submit-btn" type="submit">
         <svg v-if="loading" class="loading-spinner" viewBox="0 0 24 24">
           <circle
@@ -259,6 +267,7 @@
       </button>
     </form>
 
+    <!-- 页脚 -->
     <div class="form-footer">
       <p class="help-text">
         已有账号？
@@ -270,12 +279,6 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useSiteConfig } from '~/composables/useSiteConfig'
-import { validateOAuthRegisterCredentials } from '~/utils/oauth-register'
-
-const { siteTitle } = useSiteConfig()
-
-const siteTitleText = computed(() => siteTitle.value || 'VoiceHub')
 
 const name = ref('')
 const username = ref('')
@@ -289,12 +292,20 @@ const loading = ref(false)
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 
+// 年级对应的班级数量
 const gradeClassMap: Record<string, number> = {
   '高一年级': 20,
   '高二年级': 22,
   '高三年级': 22
 }
 
+const classOptions = computed(() => {
+  if (!grade.value) return []
+  const maxClass = gradeClassMap[grade.value] || 0
+  return Array.from({ length: maxClass }, (_, i) => i + 1)
+})
+
+// 验证字段错误
 const nameError = computed(() => name.value && (name.value.length < 2 || name.value.length > 50))
 const usernameError = computed(() => {
   if (!username.value) return false
@@ -311,13 +322,16 @@ const classError = computed(() => {
 })
 
 const handleGradeChange = () => {
+  // 重置班级选择
   selectedClass.value = ''
 }
 
 const handleRegister = async () => {
+  // 清除之前的错误
   error.value = ''
   success.value = ''
 
+  // 验证所有字段
   if (!name.value) {
     error.value = '请输入姓名'
     return
@@ -391,6 +405,7 @@ const handleRegister = async () => {
 
     if (response.success) {
       success.value = '注册成功！正在跳转...'
+      // 延迟跳转，让用户看到成功消息
       setTimeout(() => {
         navigateTo('/login?message=RegistrationSuccess')
       }, 1500)
@@ -445,7 +460,7 @@ const handleRegister = async () => {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .form-group {
@@ -454,103 +469,362 @@ const handleRegister = async () => {
   gap: 8px;
 }
 
-.input-wrapper,
-.select-wrapper {
+.form-group label {
+  font-size: 14px;
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
 }
 
-.input-icon,
-.select-icon {
+.input-wrapper::after {
+  content: '';
   position: absolute;
   left: 12px;
-  width: 20px;
-  height: 20px;
-  color: var(--text-tertiary);
+  right: 12px;
+  bottom: 8px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+  opacity: 0;
+  transform: scaleX(0.2);
+  transition:
+    transform var(--transition-normal),
+    opacity var(--transition-normal);
 }
 
-input,
-select {
+.input-wrapper:focus-within::after {
+  opacity: 0.35;
+  transform: scaleX(1);
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  width: 20px;
+  height: 20px;
+  color: var(--text-quaternary);
+  z-index: 1;
+}
+
+.input-wrapper input {
   width: 100%;
   padding: 12px 12px 12px 44px;
-  border: 1px solid var(--border-secondary);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: var(--radius-lg);
-  background: var(--bg-input);
-  color: var(--text-primary);
+  color: var(--input-text);
+  font-size: 14px;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.input-wrapper input::placeholder {
+  color: var(--input-placeholder);
+}
+
+.input-wrapper input:focus {
   outline: none;
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-shadow-focus);
+}
+
+.input-wrapper input:focus + .input-icon,
+.input-wrapper input:not(:placeholder-shown) + .input-icon {
+  color: var(--primary);
+}
+
+.input-wrapper input:hover {
+  filter: brightness(1.03);
+}
+
+.input-wrapper input.input-error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px var(--error-light);
 }
 
 .password-toggle {
   position: absolute;
-  right: 12px;
+  right: 16px;
+  width: 20px;
+  height: 20px;
   background: none;
   border: none;
+  color: var(--text-quaternary);
   cursor: pointer;
-  color: var(--text-secondary);
+  transition:
+    color 0.2s ease,
+    transform var(--transition-fast);
+  z-index: 1;
 }
 
-.error-container,
-.success-container {
+.password-toggle:hover {
+  color: var(--text-primary);
+}
+
+.password-toggle:active {
+  transform: scale(0.95);
+}
+
+.password-toggle svg {
+  width: 100%;
+  height: 100%;
+}
+
+.select-wrapper {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+}
+
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px;
+  opacity: 0;
+  transform: scaleX(0.2);
+  transition:
+    transform var(--transition-normal),
+    opacity var(--transition-normal);
+}
+
+.select-wrapper:focus-within::after {
+  opacity: 0.35;
+  transform: scaleX(1);
+}
+
+.select-icon {
+  position: absolute;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  color: var(--text-quaternary);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 12px 44px 12px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: var(--radius-lg);
+  color: var(--input-text);
+  font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.select-wrapper select:hover:not(:disabled) {
+  filter: brightness(1.03);
+}
+
+.select-wrapper select:focus {
+  outline: none;
+  border-color: var(--input-border-focus);
+  box-shadow: var(--input-shadow-focus);
+}
+
+.select-wrapper select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.select-wrapper select.select-error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 3px var(--error-light);
+}
+
+.select-wrapper select option {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .error-container {
-  background: rgba(255, 59, 48, 0.08);
-  border: 1px solid rgba(255, 59, 48, 0.18);
-  color: var(--text-danger);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--error-light);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-lg);
+  color: var(--error);
+  font-size: 14px;
 }
 
 .success-container {
-  background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.18);
-  color: var(--text-success);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--success-light);
+  border: 1px solid var(--success-border);
+  border-radius: var(--radius-lg);
+  color: var(--success);
+  font-size: 14px;
+}
+
+.auth-form.has-error {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-6px);
+  }
+  30% {
+    transform: translateX(6px);
+  }
+  45% {
+    transform: translateX(-4px);
+  }
+  60% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  90% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.error-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.success-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.error-message {
+  font-size: 14px;
+  font-weight: var(--font-medium);
+}
+
+.success-message {
+  font-size: 14px;
+  font-weight: var(--font-medium);
 }
 
 .submit-btn {
   width: 100%;
-  padding: 14px 20px;
-  border: none;
-  border-radius: var(--radius-xl);
-  background: var(--primary);
-  color: white;
+  padding: 12px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: 1px solid var(--btn-primary-border);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
   font-weight: var(--font-semibold);
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition:
+    background var(--transition-normal),
+    box-shadow var(--transition-normal),
+    transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.submit-btn::before {
+  content: none;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--btn-primary-hover);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
 }
 
 .submit-btn:disabled {
-  opacity: 0.65;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+}
+
+.submit-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
 }
 
 .form-footer {
+  margin-top: 20px;
   text-align: center;
 }
 
 .help-text {
-  color: var(--text-tertiary);
-  font-size: 14px;
+  font-size: 12px;
+  color: var(--text-quaternary);
+  margin: 0;
+  line-height: 1.5;
 }
 
 .login-link {
   color: var(--primary);
   text-decoration: none;
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-medium);
+  transition: color var(--transition-fast);
 }
 
 .login-link:hover {
+  color: var(--primary-hover);
   text-decoration: underline;
 }
 
+/* 响应式设计 */
 @media (max-width: 480px) {
-  .register-form {
-    padding: 0 8px;
+  .form-header h2 {
+    font-size: 24px;
+  }
+
+  .form-header p {
+    font-size: 14px;
+  }
+
+  .input-wrapper input,
+  .select-wrapper select {
+    padding: 10px 10px 10px 40px;
+    font-size: 16px; /* 防止iOS缩放 */
+  }
+
+  .submit-btn {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .auth-form {
+    gap: 16px;
   }
 }
 </style>
