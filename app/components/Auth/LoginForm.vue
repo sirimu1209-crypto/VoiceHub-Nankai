@@ -1,10 +1,9 @@
 <template>
   <div class="login-form">
     <div class="form-header">
-      <h2>{{ getFormTitle }}</h2>
-      <p v-if="isBindMode && !showCreateMode">即将绑定 {{ providerName }} 账号: {{ providerUsername }}</p>
-      <p v-else-if="isBindMode && showCreateMode">通过 {{ providerName }} 创建新账户</p>
-      <p v-else>登录您的VoiceHub账户</p>
+      <h2>{{ isBindMode ? '绑定账号' : '欢迎进入广播站系统' }}</h2>
+      <p v-if="isBindMode">即将绑定 {{ providerName }} 账号: {{ providerUsername }}</p>
+      <p v-else>Nanyu Secondary School</p>
     </div>
 
     <!-- OAuth 账号创建/绑定模式选择器 -->
@@ -256,25 +255,13 @@
       </button>
     </form>
 
-    <div v-if="!isBindMode && isWebAuthnSupported" class="webauthn-section">
-      <div class="divider">
-        <span>或</span>
-      </div>
-      <button 
-        type="button" 
-        class="webauthn-btn" 
-        :disabled="loading" 
-        @click="handleWebAuthnLogin"
-      >
-        <Fingerprint :size="20" class="webauthn-icon" />
-        <span>使用 Windows Hello / Passkey 登录</span>
-      </button>
-    </div>
-
     <AuthOAuthButtons v-if="!isBindMode" />
 
     <div class="form-footer">
-      <p class="help-text">不同VoiceHub平台的账号不互通</p>
+      <p class="help-text">
+        还没有账号？
+        <NuxtLink to="/register" class="login-link">立即注册</NuxtLink>
+      </p>
     </div>
 
     <AuthTwoFactorVerify
