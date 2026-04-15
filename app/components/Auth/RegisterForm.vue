@@ -1,8 +1,8 @@
 <template>
   <div class="register-form">
     <div class="form-header">
-      <h2>创建账号</h2>
-      <p>Nanyu Secondary School</p>
+      <h2>创建南开之声账号</h2>
+      <p>Nankai Secondary School</p>
     </div>
 
     <form :class="['auth-form', { 'has-error': !!error }]" @submit.prevent="handleRegister">
