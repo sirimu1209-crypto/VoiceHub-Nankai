@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt'
-import { db, users } from '~/drizzle/db'
+import { db, eq, and, users } from '~/drizzle/db'
 import { JWTEnhanced } from '~~/server/utils/jwt-enhanced'
 import { getBeijingTime } from '~/utils/timeUtils'
 import { validateOAuthRegisterCredentials } from '~/utils/oauth-register'
@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event)
     const { username, name, password, confirmPassword, grade, class: classValue } = body
 
+    // 验证输入
     if (!username || !name || !password || !confirmPassword || !grade || !classValue) {
       throw createError({
         statusCode: 400,
@@ -25,6 +26,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // 验证姓名长度
     if (name.length < 2 || name.length > 50) {
       throw createError({
         statusCode: 400,
@@ -32,6 +34,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // 验证年级和班级
     const validGrades = ['高一年级', '高二年级', '高三年级']
     if (!validGrades.includes(grade)) {
       throw createError({
@@ -48,6 +51,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // 检查用户名是否已存在
     const existingUser = await db.query.users.findFirst({
       where: (t, { eq }) => eq(t.username, username)
     })
@@ -59,6 +63,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
+    // 检查姓名、年级、班级是否已存在
     const existingUserByDetails = await db.query.users.findFirst({
       where: (t, { eq, and }) => and(
         eq(t.name, name),
@@ -75,6 +80,7 @@ export default defineEventHandler(async (event) => {
     }
 
     try {
+      // 创建用户
       const hashedPassword = await bcrypt.hash(password, 10)
       const now = getBeijingTime()
 
@@ -100,13 +106,16 @@ export default defineEventHandler(async (event) => {
         throw new Error('Failed to create user')
       }
 
+      // 自动判断是否需要secure
       const isSecure = isSecureRequest(event)
+
+      // 设置cookie
       const token = JWTEnhanced.generateToken(newUser.id, 'USER')
       setCookie(event, 'auth-token', token, {
         httpOnly: true,
         secure: isSecure,
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: 60 * 60 * 24 * 7, // 7天
         path: '/'
       })
 
