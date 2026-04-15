@@ -2,10 +2,7 @@
   <div class="auth-layout">
     <div class="auth-container">
       <div class="form-section">
-        <div class="form-header">
-          <div class="logo-row">
-            <img :src="brandLogoSrc" alt="Brand Logo" class="brand-logo-center" >
-            <div v-if="schoolLogoHomeUrl && schoolLogoHomeUrl.trim()" class="logo-divider" />
+        <div class="logo-row">
             <img
               v-if="schoolLogoHomeUrl && schoolLogoHomeUrl.trim()"
               :src="schoolLogoHomeUrl"
@@ -13,9 +10,6 @@
               class="school-logo"
             >
           </div>
-          <h1 class="form-title">{{ siteTitle ? siteTitle + ' | VoiceHub' : 'VoiceHub' }}</h1>
-          <div class="header-divider" />
-        </div>
         <ClientOnly>
           <LoginForm />
         </ClientOnly>
@@ -30,6 +24,7 @@
 import { onMounted, computed, ref } from 'vue'
 import LoginForm from '~/components/Auth/LoginForm.vue'
 import logo from '~~/public/images/logo.svg'
+import { useSiteConfig } from '~/composables/useSiteConfig'
 
 // 使用站点配置
 const { siteTitle, initSiteConfig, logoUrl, schoolLogoHomeUrl, icp: icpNumber } = useSiteConfig()
@@ -204,7 +199,8 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   gap: var(--logo-gap);
-  margin-bottom: 12px;
+  margin-bottom: 28px;
+  margin-top: 8px;
 }
 
 .logo-divider {
@@ -224,13 +220,18 @@ onMounted(async () => {
 }
 
 .school-logo {
-  width: var(--school-logo-size);
-  height: var(--school-logo-size);
+  max-width: 150px;
+  height: auto;
+  max-height: 60px;
   margin: 0;
   object-fit: contain;
-  max-width: 100%;
-  max-height: 100%;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+  transition: transform var(--transition-slow), filter var(--transition-slow);
+}
+
+.school-logo:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
 }
 
 .form-title {
