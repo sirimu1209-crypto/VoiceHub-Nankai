@@ -1,9 +1,9 @@
 <template>
   <div class="login-form">
     <div class="form-header">
-      <h2>{{ isBindMode ? '绑定账号' : '欢迎进入广播站系统' }}</h2>
+      <h2>{{ isBindMode ? '绑定账号' : '欢迎进入南开之声' }}</h2>
       <p v-if="isBindMode">即将绑定 {{ providerName }} 账号: {{ providerUsername }}</p>
-      <p v-else>Nanyu Secondary School</p>
+      <p v-else>Nankai Secondary School</p>
     </div>
 
     <form :class="['auth-form', { 'has-error': !!error }]" @submit.prevent="handleLogin">
