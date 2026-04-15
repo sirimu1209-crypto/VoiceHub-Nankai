@@ -21,14 +21,27 @@
 </template>
 
 <script setup>
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import RegisterForm from '~/components/Auth/RegisterForm.vue'
+import logo from '~~/public/images/logo.svg'
 import { useSiteConfig } from '~/composables/useSiteConfig'
 
-const { siteTitle, initSiteConfig, schoolLogoHomeUrl } = useSiteConfig()
+// 使用站点配置
+const { siteTitle, initSiteConfig, logoUrl, schoolLogoHomeUrl, icp: icpNumber } = useSiteConfig()
 
+// 主品牌Logo优先使用SVG，其次使用站点配置中非ICO的地址
+const brandLogoSrc = computed(() => {
+  const url = logoUrl.value
+  if (url && !url.endsWith('.ico')) return url
+  return logo
+})
+
+// 在组件挂载后初始化站点配置
 onMounted(async () => {
+  // 初始化站点配置
   await initSiteConfig()
+
+  // 设置页面标题
   if (typeof document !== 'undefined' && siteTitle.value) {
     document.title = `注册 | ${siteTitle.value}`
   }
@@ -44,6 +57,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: flex-start;
   padding: 20px;
+  /* 响应式尺寸变量 */
   --brand-logo-size: clamp(48px, 8vw, 96px);
   --school-logo-size: clamp(96px, 16vw, 160px);
   --logo-gap: clamp(12px, 2vw, 24px);
@@ -59,8 +73,8 @@ onMounted(async () => {
   border: 1px solid var(--border-primary);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
-  margin: auto 0;
-  margin-bottom: var(--content-footer-gap);
+  margin: auto 0; /* 在纵向布局中居中 */
+  margin-bottom: var(--content-footer-gap); /* 与底部footer保持最小距离 */
 }
 
 .form-section {
@@ -106,9 +120,10 @@ onMounted(async () => {
 
 .school-logo:hover {
   transform: translateY(-3px) scale(1.02);
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
 }
 
+/* 响应式设计 */
 @media (max-width: 480px) {
   .auth-layout {
     padding: 12px;
