@@ -193,10 +193,11 @@
             id="class"
             v-model="selectedClass"
             :class="{ 'input-error': error && classError }"
-            placeholder="请输入班级（正整数）"
+            placeholder="请输入班级（1-30的正整数）"
             required
             type="number"
             min="1"
+            max="30"
             step="1"
             @input="error = ''"
           >
@@ -306,7 +307,12 @@ const classOptions = computed(() => {
 })
 
 // 验证字段错误
-const nameError = computed(() => name.value && (name.value.length < 2 || name.value.length > 50))
+const nameError = computed(() => {
+  if (!name.value) return false
+  const chineseChars = name.value.match(/[\u4e00-\u9fa5]/g)
+  const chineseCount = chineseChars ? chineseChars.length : 0
+  return chineseCount < 2 || chineseCount > 5
+})
 const usernameError = computed(() => {
   if (!username.value) return false
   if (username.value.length < 3 || username.value.length > 30) return true
@@ -318,7 +324,7 @@ const gradeError = computed(() => !grade.value)
 const classError = computed(() => {
   if (!selectedClass.value) return false
   const num = parseInt(selectedClass.value)
-  return isNaN(num) || num <= 0
+  return isNaN(num) || num <= 0 || num > 30
 })
 
 const handleGradeChange = () => {
@@ -338,7 +344,7 @@ const handleRegister = async () => {
   }
 
   if (nameError.value) {
-    error.value = '姓名长度需要在2-50个字符之间'
+    error.value = '姓名必须是2-5个汉字'
     return
   }
 
@@ -383,8 +389,8 @@ const handleRegister = async () => {
   }
 
   const classNum = parseInt(selectedClass.value)
-  if (isNaN(classNum) || classNum <= 0) {
-    error.value = '班级必须是正整数'
+  if (isNaN(classNum) || classNum <= 0 || classNum > 30) {
+    error.value = '班级必须是1-30之间的正整数'
     return
   }
 
