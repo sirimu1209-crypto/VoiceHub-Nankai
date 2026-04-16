@@ -26,11 +26,13 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    // 验证姓名长度
-    if (name.length < 2 || name.length > 50) {
+    // 验证姓名：必须是2-5个汉字
+    const chineseChars = name.match(/[\u4e00-\u9fa5]/g)
+    const chineseCount = chineseChars ? chineseChars.length : 0
+    if (chineseCount < 2 || chineseCount > 5) {
       throw createError({
         statusCode: 400,
-        message: '姓名长度需要在2-50个字符之间'
+        message: '姓名必须是2-5个汉字'
       })
     }
 
@@ -44,10 +46,10 @@ export default defineEventHandler(async (event) => {
     }
 
     const classNum = parseInt(classValue, 10)
-    if (isNaN(classNum) || classNum <= 0) {
+    if (isNaN(classNum) || classNum <= 0 || classNum > 30) {
       throw createError({
         statusCode: 400,
-        message: '无效的班级选择'
+        message: '班级必须是1-30之间的正整数'
       })
     }
 
